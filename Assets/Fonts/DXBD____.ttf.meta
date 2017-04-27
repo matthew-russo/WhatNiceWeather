@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: fdcc176d8226e7d4d99a03fbd035065c
+timeCreated: 1489378009
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Dax-Bold
+  fontNames:
+  - Dax-Bold
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
