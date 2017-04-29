@@ -1,4 +1,4 @@
-What Nice Weather
+<strong>What Nice Weather</strong>
 
 My midterm assignment for Intermediate Programming
 
