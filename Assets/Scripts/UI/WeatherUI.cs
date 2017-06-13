@@ -14,7 +14,7 @@ public class WeatherUI : MonoBehaviour
     
     // Reference to the weatherIcon we will load
     //
-    public Texture2D weatherIcon;
+    public Sprite weatherIcon;
 
     private bool hasUpdated = false;
 
@@ -26,7 +26,7 @@ public class WeatherUI : MonoBehaviour
 	
 	void Update ()
 	{
-	    if (!hasUpdated)
+	    if (!hasUpdated && SavingLoadingData.Instance.finishedLoading)
 	    {
             // Adds the name of the type of weather to the UI
             //
@@ -36,9 +36,10 @@ public class WeatherUI : MonoBehaviour
             // Loads in as a Texture2D so we need to create a sprite from that via scripting before we can apply it to the UI Image.
             //
             string filepath = "WeatherIcons/" + CovertCurrentWeatherToWeatherSystem.Instance.weatherIcon;
-            weatherIcon = Resources.Load(filepath) as Texture2D;
-            Sprite icon = Sprite.Create(weatherIcon, new Rect(0,0,weatherIcon.width,weatherIcon.height), new Vector2(.5f,.5f));
-	        weatherImage.sprite = icon;
+	        weatherIcon = Resources.Load<Sprite>(filepath);
+            //weatherIcon = Resources.Load(filepath) as Texture2D;
+            //Sprite icon = Sprite.Create(weatherIcon, new Rect(0,0,weatherIcon.width,weatherIcon.height), new Vector2(.5f,.5f));
+	        weatherImage.sprite = weatherIcon;
 
             // Bool so we only do this once in the beginning of the game, but after start so everything is sure to be initialized
             //

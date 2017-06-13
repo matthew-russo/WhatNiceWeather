@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.IO;
-using System.Linq;
-using System.Net.NetworkInformation;
+using System.Net;
 using UnityEngine;
 using Patterns;
+using UnityEngine.Networking;
 
 public class SavingLoadingData : Singleton<SavingLoadingData>
 {
@@ -16,22 +16,19 @@ public class SavingLoadingData : Singleton<SavingLoadingData>
 
     public JSONObject json;
 
-    string URL = "http://matthewclayrusso.com/weather";
-    
+    string URL = "https://matthewclayrusso.com/weather";
+
+    public bool finishedLoading = false;
 
     public void Awake () {
         // Save and Load Assets from the Streaming Assets folder
         //
-        savePath = Application.streamingAssetsPath;
+        savePath = Application.persistentDataPath;
 
         // Pulls New York Weather data from my server which pulls from OpenWeatherMap API
         // Saves the json string in a file. If weather has been recently checked, it uses the most recent data
         //
-        LoadWeatherFromAPITEST(URL);
-
-        // Loads the json string received from the Weather API into a JSON C# Object so that we can access it from other scripts in an easy to use manner.
-        //
-        json = LoadDataAsJSON("lastAPIData.txt");
+        StartCoroutine(LoadWeatherFromAPITEST(URL));
     }
 
     // Saves string input data into the given file name
@@ -42,7 +39,7 @@ public class SavingLoadingData : Singleton<SavingLoadingData>
 
         if (!File.Exists(filePath))
         {
-            File.Create(filePath);
+            File.Create(filePath).Dispose();
         }
 
         File.WriteAllText(filePath, data);
@@ -84,15 +81,28 @@ public class SavingLoadingData : Singleton<SavingLoadingData>
     // API can only handle 1 request per 10 minutes, so check if the last request was more than 10 minutes ago, and if so, send a new request to the given api url. It takes the data and saves it as a string to "/StreamingAssets/lastAPIData.txt"
     // if previous request was less than 10 minutes, load the previous data from "/StreamingAssets/lastAPIData.txt". Finally it saves the current time of this request to "/StreamingAssets/lastAPIRequest.txt"
     //
-    void LoadWeatherFromAPITEST(string url)
+    IEnumerator LoadWeatherFromAPITEST(string url)
     {
-       
-        WWW newWWW = new WWW(url);
-        while (!newWWW.isDone)
-        {
-            Debug.Log("waiting for :  " + Time.time);
-        }
-        Debug.Log(newWWW.text);
-        SaveDataToFile("lastAPIData.txt", newWWW.text);
+        UnityWebRequest webRequest = UnityWebRequest.Get(url);
+        yield return webRequest.Send();
+     
+        Debug.Log(webRequest.isError ? webRequest.error : webRequest.downloadHandler.text);
+
+        SaveDataToFile("lastAPIData.txt", webRequest.downloadHandler.text);
+
+        // Loads the json string received from the Weather API into a JSON C# Object so that we can access it from other scripts in an easy to use manner.
+        //
+        json = LoadDataAsJSON("lastAPIData.txt");
+
+        // Gets Sunrise, Sunset, and current WeatherID from JSON data.
+        // Sunrise and Sunset times as well as current time are set directly in the To D_Base Script on TimeOfDay object in hierarchy
+        // ChangeWeatherSystem fucntion takes WeatherID from JSON and changes the in-game weather accordingly.
+        //
+        CovertCurrentWeatherToWeatherSystem.Instance.data = json;
+        CovertCurrentWeatherToWeatherSystem.Instance.PullSunriseSunsetTimesFromJSON();
+        CovertCurrentWeatherToWeatherSystem.Instance.PullWeatherIDFromJSON();
+        CovertCurrentWeatherToWeatherSystem.Instance.ChangeWeatherSystem();
+
+        finishedLoading = true;
     }
 }

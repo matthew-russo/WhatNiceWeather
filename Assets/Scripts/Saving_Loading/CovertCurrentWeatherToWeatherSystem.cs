@@ -108,21 +108,9 @@ public class CovertCurrentWeatherToWeatherSystem : Singleton<CovertCurrentWeathe
         //{900, "extreme" }, ADD NEW WEATHER TYPES
     };
 
-    // Gets Sunrise, Sunset, and current WeatherID from JSON data.
-    // Sunrise and Sunset times as well as current time are set directly in the To D_Base Script on TimeOfDay object in hierarchy
-    // ChangeWeatherSystem fucntion takes WeatherID from JSON and changes the in-game weather accordingly.
-    //
-	void Start ()
-	{
-	    data = SavingLoadingData.Instance.json;
-	    PullSunriseSunsetTimesFromJSON();
-	    PullWeatherIDFromJSON();
-        ChangeWeatherSystem();
-	}
-
     // Takes WeatherID from JSON and changes the in-game weather accordingly.
     //
-    void ChangeWeatherSystem()
+    public void ChangeWeatherSystem()
     {
         Weather_Controller.Instance.ExitCurrentWeather((int)WeatherIDsAndCorrespondingType[weatherID]);
         Debug.Log("Changing weather to : " + WeatherIDsAndCorrespondingType[weatherID]);
@@ -131,7 +119,7 @@ public class CovertCurrentWeatherToWeatherSystem : Singleton<CovertCurrentWeathe
     // Pulls the sunrise and sunset data from API
     // Inital format is UTC ticks so we have to use the DateTime class to convert that to normal readable time
     //
-    void PullSunriseSunsetTimesFromJSON()
+    public void PullSunriseSunsetTimesFromJSON()
     {
         var sunriseSec = data["sys"]["sunrise"];
         sunriseTime = new DateTime(1970, 1, 1, 0, 0, 0, 0);
@@ -148,7 +136,7 @@ public class CovertCurrentWeatherToWeatherSystem : Singleton<CovertCurrentWeathe
     // WeatherID is used to change in game weather
     // Icon name and main detail are used for UI
     //
-    void PullWeatherIDFromJSON()
+    public void PullWeatherIDFromJSON()
     {
         weatherID = (int)data["weather"][0]["id"].i;
         weatherIcon = data["weather"][0]["icon"].str;
